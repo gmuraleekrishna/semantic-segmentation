@@ -2,3 +2,5 @@ numpy
 keras
 absl-py
 pillow
+sklearn
+opencv-python
