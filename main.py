@@ -12,7 +12,6 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from skimage import color, exposure, transform, io
 
 from model import Model
 from helpers import get_images_and_masks, convert_to_labels
