@@ -39,7 +39,7 @@ BATCH_SIZE = 2
 
 model = Model(no_of_classes=n_classes, height=img_h, width=img_w)
 optimizer = RMSprop(lr=0.01)
-model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['categorical_accuracy', 'binary_accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy', 'categorical_accuracy'])
 utils.print_summary(model)
 print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
 print("Model compiled")
