@@ -41,6 +41,21 @@ palette = {
     (0, 0, 0): 0,
 }
 
+inverse_palette = {
+    0: (0, 0, 0),
+    1: (128, 128, 128),
+    2: (128, 0, 0),
+    3: (128, 64, 128),
+    4: (0, 0, 192),
+    5: (64, 64, 128),
+    6: (128, 128, 0),
+    7: (192, 192, 128),
+    8: (64, 0, 128),
+    9: (192, 128, 128),
+    10: (64, 64, 0),
+    11: (0, 128, 192)
+}
+
 classes = {
     'sky': 1,
     'building': 2,
@@ -57,22 +72,31 @@ classes = {
 
 
 def convert_to_labels(masks, load_from_file=False):
-    labels = np.zeros((masks.shape[0], masks.shape[1], masks.shape[2], 1), dtype=np.uint8)
+    labels = np.zeros((masks.shape[0], masks.shape[1], masks.shape[2], 12), dtype=np.uint8)
 
     if(load_from_file and os.path.exists('labels.npy')):
         labels = np.load('labels.npy')
     else:
         count = 0
         for image in masks:
-            count += 1
             percentage = int(100*count/masks.shape[0])
             s = str(percentage) + '%'  
             print('{0}\r'.format(s), end='') 
-            label = np.zeros((image.shape[0], image.shape[1], 1), dtype=np.uint8)
-            for c, i in palette.items():
-                m = np.all(image == np.array(c).reshape(1, 1, 3), axis=2)
-                label[m] = i
-            np.append(labels, label)
+            background = np.all(image == np.array(inverse_palette[0]).reshape(1, 1, 3), axis=2)
+            sky = np.all(image == np.array(inverse_palette[1]).reshape(1, 1, 3), axis=2)
+            building = np.all(image == np.array(inverse_palette[2]).reshape(1, 1, 3), axis=2)
+            road = np.all(image == np.array(inverse_palette[3]).reshape(1, 1, 3), axis=2)
+            sidewalk = np.all(image == np.array(inverse_palette[4]).reshape(1, 1, 3), axis=2)
+            fence = np.all(image == np.array(inverse_palette[5]).reshape(1, 1, 3), axis=2)
+            vegetation = np.all(image == np.array(inverse_palette[6]).reshape(1, 1, 3), axis=2)
+            pole = np.all(image == np.array(inverse_palette[7]).reshape(1, 1, 3), axis=2)
+            car = np.all(image == np.array(inverse_palette[8]).reshape(1, 1, 3), axis=2)
+            sign = np.all(image == np.array(inverse_palette[9]).reshape(1, 1, 3), axis=2)
+            pedestrian = np.all(image == np.array(inverse_palette[10]).reshape(1, 1, 3), axis=2)
+            cyclist = np.all(image == np.array(inverse_palette[11]).reshape(1, 1, 3), axis=2)
+            categorical_labels = np.dstack([background, sky, building, road, sidewalk, fence, vegetation, pole, car, sign, pedestrian, cyclist])
+            labels[count] = categorical_labels.astype(np.float32)
+            count += 1
         np.save('labels.npy', labels)
     return labels
 

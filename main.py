@@ -1,7 +1,7 @@
 # Importing the Keras libraries and packages
 from keras.models import Sequential
 from keras import losses, optimizers
-from keras.optimizers import SGD
+from keras.optimizers import RMSprop
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from keras import utils
@@ -12,10 +12,17 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import win_unicode_console
 
 from model import Model
 from helpers import get_images_and_masks, convert_to_labels, get_model_memory_usage
+win_unicode_console.enable()
 K.set_image_data_format('channels_last')
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+sess = tf.Session(config=config)
+K.tensorflow_backend.set_session(sess)
 
 img_w = 480
 img_h = 352
@@ -28,10 +35,11 @@ TRAIN_MASK_DIR = 'kitti/train/labels/'
 
 VAL_IMAGE_DIR = 'kitti/test/images/'
 VAL_MASK_DIR = 'kitti/test/labels/'
-BATCH_SIZE = 4
+BATCH_SIZE = 2
 
-model = Model(no_of_classes=n_classes, height=img_h, width=img_w) 
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model = Model(no_of_classes=n_classes, height=img_h, width=img_w)
+optimizer = RMSprop(lr=0.01)
+model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['categorical_accuracy', 'binary_accuracy'])
 utils.print_summary(model)
 print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
 print("Model compiled")
@@ -53,7 +61,6 @@ model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_o
 
 train_generator = zip(image_generator, mask_generator)
 print("Training")
-model.fit(images, labels, batch_size=32, epochs=20, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
-# model.fit_generator(train_generator, epochs=200, steps_per_epoch=n_train//BATCH_SIZE, shuffle=True, callbacks=[model_checkpoint, tensor_board_callback], validation_split=0.2)
+model.fit(images, labels, batch_size=BATCH_SIZE, epochs=20, verbose=1, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
 model.save('fcn.h5')
 

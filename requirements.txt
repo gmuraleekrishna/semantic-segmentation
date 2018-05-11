@@ -3,4 +3,4 @@ keras
 absl-py
 pillow
 matplotlib
-opencv-python
+win_unicode_console

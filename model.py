@@ -15,7 +15,7 @@ class Model(Sequential):
         # self.add(Flatten())
         self.add(Conv2D(filters=no_of_classes, kernel_size=(1, 1), padding='same'))
         # self.add(Reshape((no_of_classes, height , width), input_shape=(height, width, no_of_classes)))
-        self.add(Dense(1))
+        # self.add(Dense(1))
         self.add(Activation('softmax')) # output size (None, 480, 640, 11)
         # self.add(Permute((2, 1)))
 
