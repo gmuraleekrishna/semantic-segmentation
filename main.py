@@ -14,12 +14,12 @@ import numpy as np
 import os
 
 from model import Model
-from helpers import get_images_and_masks, convert_to_labels
+from helpers import get_images_and_masks, convert_to_labels, get_model_memory_usage
 K.set_image_data_format('channels_last')
 
 img_w = 480
 img_h = 352
-classes = 12
+n_classes = 12
 n_train = 399
 n_val = 46
 seed = 1
@@ -30,16 +30,17 @@ VAL_IMAGE_DIR = 'kitti/test/images/'
 VAL_MASK_DIR = 'kitti/test/labels/'
 BATCH_SIZE = 4
 
-print("Model compiled")
-model = Model(no_of_classes=classes, height=img_h, width=img_w) 
+model = Model(no_of_classes=n_classes, height=img_h, width=img_w) 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-
+utils.print_summary(model)
+print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
+print("Model compiled")
 
 print("Generating dataset")
-images, masks = get_images_and_masks(TRAIN_IMAGE_DIR, TRAIN_MASK_DIR, img_h, img_w)
+images, masks = get_images_and_masks(TRAIN_IMAGE_DIR, TRAIN_MASK_DIR, img_h, img_w, load_from_file=True)
 print("Images imported")
 print("Creating labels")
-labels = convert_to_labels(masks)
+labels = convert_to_labels(masks, load_from_file=True)
 print("Labels created")
 image_datagen = ImageDataGenerator()
 mask_datagen = ImageDataGenerator()
@@ -51,6 +52,7 @@ tensor_board_callback = TensorBoard(log_dir='graph', histogram_freq=0, write_gra
 model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_only=True)
 
 train_generator = zip(image_generator, mask_generator)
+print("Training")
 model.fit(images, labels, batch_size=32, epochs=20, verbose=1, shuffle=True, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
 # model.fit_generator(train_generator, epochs=200, steps_per_epoch=n_train//BATCH_SIZE, shuffle=True, callbacks=[model_checkpoint, tensor_board_callback], validation_split=0.2)
 model.save('fcn.h5')
