@@ -3,7 +3,7 @@ A project to semantically segment images with SegNet https://arxiv.org/pdf/1511.
 
 Use KITTI semantic segmentation dataset and create following folder structure
 
-    |_kitty/
+    |_kitti/
     |    |__train/
     |    |   |_images/
     |    |   |_labels/
@@ -16,4 +16,4 @@ Use KITTI semantic segmentation dataset and create following folder structure
 ## Usage
     $ pip install -r requirements.txt
     $ python main.py
-    $ tensorboard --logdir=graphs/
+    $ tensorboard --logdir=graph/
