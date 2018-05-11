@@ -106,10 +106,7 @@ def get_images_and_masks(image_folder, mask_folder, height, width, load_from_fil
         np.save('masks.npy', masks)
     return images, masks
 
-<<<<<<< HEAD
-=======
 
->>>>>>> Save preperation data to npy
 def get_images_and_masks(image_folder, mask_folder, height, width, load_from_file=False):
     if(load_from_file):
         images = np.load('images.npy')
