@@ -107,37 +107,6 @@ def get_images_and_masks(image_folder, mask_folder, height, width, load_from_fil
     return images, masks
 
 
-def get_images_and_masks(image_folder, mask_folder, height, width, load_from_file=False):
-    if(load_from_file):
-        images = np.load('images.npy')
-        masks = np.load('masks.npy')
-    else:
-        image_file_names = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f)) and f.endswith(".png")]
-        number_of_images = len(image_file_names)
-        images = np.zeros((number_of_images, height, width, 3))
-        masks = np.zeros((number_of_images, height, width, 3))
-        count = 0
-        for image_file_name in image_file_names:
-            percentage = int(100*count/number_of_images)
-            s = str(percentage) + '%'                        # string for output
-            print('{0}\r'.format(s), end='') 
-            image = Image.open(os.path.join(image_folder, image_file_name))
-            mask = Image.open(os.path.join(mask_folder, image_file_name))
-            im = np.asarray(image)
-            msk = np.asarray(mask)
-            image.close()
-            mask.close()
-            im = np.resize(im, (height, width, 3))
-            msk = np.resize(msk, (height, width, 3))
-            images[count] = im
-            masks[count] = msk
-            count += 1
-        print("\n")
-        np.save('images.npy', images)
-        np.save('masks.npy', masks)
-    return images, masks
-
-
 def get_model_memory_usage(batch_size, model):
     shapes_mem_count = 0
     for l in model.layers:
