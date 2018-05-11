@@ -4,3 +4,4 @@ absl-py
 pillow
 matplotlib
 win_unicode_console
+tensorflow
