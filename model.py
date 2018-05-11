@@ -8,41 +8,38 @@ class Model(Sequential):
         self.add(Conv2D(filters=64, kernel_size=(3, 3), padding='same', input_shape=(height, width, 3)))   # Input layer
         self.add(BatchNormalization())
         self.add(Activation(activation='relu'))
-        # DownSapmpling
         self.encoder()
         self.decoder()
-        self.add(Dropout(0.2))
-        # self.add(Flatten())
         self.add(Conv2D(filters=no_of_classes, kernel_size=(1, 1), padding='same'))
-        # self.add(Reshape((no_of_classes, height , width), input_shape=(height, width, no_of_classes)))
-        # self.add(Dense(1))
         self.add(Activation('softmax')) # output size (None, 480, 640, 11)
-        # self.add(Permute((2, 1)))
 
-
-        # Upsampling
     def decoder(self):
         self.add(UpSampling2D())
         self.convolution_block(512)
         self.convolution_block(512)
         self.convolution_block(512)
+        self.add(Dropout(0.2))
 
         self.add(UpSampling2D())
         self.convolution_block(512)
         self.convolution_block(512)
         self.convolution_block(256)
+        self.add(Dropout(0.2))
 
         self.add(UpSampling2D())
         self.convolution_block(256)
         self.convolution_block(256)
         self.convolution_block(128)
+        self.add(Dropout(0.2))
 
         self.add(UpSampling2D())
         self.convolution_block(128)
         self.convolution_block(64)
+        self.add(Dropout(0.2))
 
         self.add(UpSampling2D())
         self.convolution_block(64)
+        self.add(Dropout(0.2))
 
     def encoder(self):
         self.convolution_block(64)
