@@ -58,7 +58,8 @@ classes = {
 
 def convert_to_labels(masks, load_from_file=False):
     labels = np.zeros((masks.shape[0], masks.shape[1], masks.shape[2], 1), dtype=np.uint8)
-    if(load_from_file):
+
+    if(load_from_file and os.path.exists('labels.npy')):
         labels = np.load('labels.npy')
     else:
         count = 0
@@ -77,7 +78,7 @@ def convert_to_labels(masks, load_from_file=False):
 
 
 def get_images_and_masks(image_folder, mask_folder, height, width, load_from_file=False):
-    if(load_from_file):
+    if(load_from_file and os.path.exists('images.npy') and os.path.exists('masks.npy')):
         images = np.load('images.npy')
         masks = np.load('masks.npy')
     else:
@@ -105,6 +106,10 @@ def get_images_and_masks(image_folder, mask_folder, height, width, load_from_fil
         np.save('masks.npy', masks)
     return images, masks
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Save preperation data to npy
 def get_images_and_masks(image_folder, mask_folder, height, width, load_from_file=False):
     if(load_from_file):
         images = np.load('images.npy')
