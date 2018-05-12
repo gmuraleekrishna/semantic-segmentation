@@ -12,12 +12,14 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import win_unicode_console
+import platform
+if platform.system() is 'Windows':
+    import win_unicode_console
+    win_unicode_console.enable()
 
 from segnet_basic import SegNetBasic
 from segnet import SegNet
-from helpers import get_images_and_masks, convert_to_labels
-win_unicode_console.enable()
+from helpers import get_images_and_masks, convert_to_labels, get_model_memory_usage
 K.set_image_data_format('channels_last')
 
 config = tf.ConfigProto()
@@ -25,8 +27,8 @@ config.gpu_options.allow_growth = True  # dynamically grow the memory used on th
 sess = tf.Session(config=config)
 K.tensorflow_backend.set_session(sess)
 
-img_w = 640
-img_h = 480
+img_w = 480
+img_h = 352
 n_classes = 12
 n_train = 399
 n_val = 46
@@ -42,7 +44,7 @@ model = SegNet(no_of_classes=n_classes, height=img_h, width=img_w)
 optimizer = Adam(lr=0.01)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 utils.print_summary(model)
-# print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
+print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
 print("Model compiled")
 
 print("Generating dataset")
