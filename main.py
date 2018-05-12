@@ -12,14 +12,16 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import platform
-if platform.system() is 'Windows':
-    import win_unicode_console
-    win_unicode_console.enable()
+
 
 from segnet_basic import SegNetBasic
 from segnet import SegNet
 from helpers import get_images_and_masks, convert_to_labels, get_model_memory_usage
+import platform
+if platform.system() is 'Windows':
+    import win_unicode_console
+    win_unicode_console.enable()
+    
 K.set_image_data_format('channels_last')
 
 config = tf.ConfigProto()
