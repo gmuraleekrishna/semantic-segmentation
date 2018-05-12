@@ -1,7 +1,7 @@
 # Importing the Keras libraries and packages
 from keras.models import Sequential
 from keras import losses, optimizers
-from keras.optimizers import RMSprop
+from keras.optimizers import Adam
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from keras import utils
@@ -14,8 +14,9 @@ import numpy as np
 import os
 import win_unicode_console
 
-from model import Model
-from helpers import get_images_and_masks, convert_to_labels, get_model_memory_usage
+from segnet_basic import SegNetBasic
+from segnet import SegNet
+from helpers import get_images_and_masks, convert_to_labels
 win_unicode_console.enable()
 K.set_image_data_format('channels_last')
 
@@ -24,8 +25,8 @@ config.gpu_options.allow_growth = True  # dynamically grow the memory used on th
 sess = tf.Session(config=config)
 K.tensorflow_backend.set_session(sess)
 
-img_w = 480
-img_h = 352
+img_w = 640
+img_h = 480
 n_classes = 12
 n_train = 399
 n_val = 46
@@ -37,11 +38,11 @@ VAL_IMAGE_DIR = 'kitti/test/images/'
 VAL_MASK_DIR = 'kitti/test/labels/'
 BATCH_SIZE = 2
 
-model = Model(no_of_classes=n_classes, height=img_h, width=img_w)
-optimizer = RMSprop(lr=0.01)
-model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy', 'categorical_accuracy'])
+model = SegNet(no_of_classes=n_classes, height=img_h, width=img_w)
+optimizer = Adam(lr=0.01)
+model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 utils.print_summary(model)
-print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
+# print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
 print("Model compiled")
 
 print("Generating dataset")
@@ -54,7 +55,7 @@ image_datagen = ImageDataGenerator()
 mask_datagen = ImageDataGenerator()
 
 image_generator = image_datagen.flow(images, seed=seed, batch_size=BATCH_SIZE)
-mask_generator = image_datagen.flow(labels, seed=seed, batch_size=BATCH_SIZE)
+mask_generator = mask_datagen.flow(labels, seed=seed, batch_size=BATCH_SIZE)
 
 tensor_board_callback = TensorBoard(log_dir='graph', histogram_freq=0, write_graph=True, write_images=True)
 model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_only=True)
