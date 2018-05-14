@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-
+from vgg_16_segnet_basic import VGG16SegNetBasic
 from segnet_basic import SegNetBasic
 from segnet import SegNet
 from helpers import get_images_and_masks, convert_to_labels, get_model_memory_usage
@@ -21,7 +21,7 @@ import platform
 if platform.system() is 'Windows':
     import win_unicode_console
     win_unicode_console.enable()
-    
+
 K.set_image_data_format('channels_last')
 
 config = tf.ConfigProto()
@@ -68,4 +68,3 @@ train_generator = zip(image_generator, mask_generator)
 print("Training")
 model.fit(images, labels, batch_size=BATCH_SIZE, epochs=20, verbose=1, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
 model.save('fcn.h5')
-
