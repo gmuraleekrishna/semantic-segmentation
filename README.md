@@ -29,5 +29,6 @@ Training ran for 200 epocs with 8 images per batch.
     
 ## References:
 
- [1]   V. Badrinarayanan, A. Kendall, and R. Cipolla, "SegNet: A Deep Convolutional Encoder-Decoder Architecture for Image    Segmentation",  *arXiv:1511.005eprint61*, 2015
+ [1]   V. Badrinarayanan, A. Kendall, and R. Cipolla, "SegNet: A Deep Convolutional Encoder-Decoder Architecture for Image    Segmentation",  *arXiv:1511.005eprint61*, 2015.
+ 
  [2]  A. Karpathy, "CS231n Convolutional Neural Networks for Visual Recognition", Available: http://cs231n.github.io/transfer-learning/
