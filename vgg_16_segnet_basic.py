@@ -1,25 +1,27 @@
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Activation, MaxPooling2D, UpSampling2D, BatchNormalization
+from keras.models import Model
+from keras.layers import Conv2D, MaxPooling2D,Input, Activation, MaxPooling2D, UpSampling2D, BatchNormalization
 from keras.applications.vgg16 import VGG16
 
-class VGG16SegNetBasic(Sequential):
+class VGG16SegNetBasic(Model):
     def __init__(self, no_of_classes, height, width):
         self.layers = []
         input_layer = Input(shape=(height, width, 3))
-        output = self.encoder(kernel=3, input=input_layer)
-        output = self.decoder(kernel=3, input=output)
+        output = self.encoder(input=input_layer, no_of_classes=no_of_classes)
+        output = self.decoder(input=output, kernel=3)
         output = Conv2D(no_of_classes, (1, 1), padding="valid")(output)
         output = BatchNormalization()(output)
         output = Activation('softmax')(output)
         self.layers.append([input_layer, output])
         super(VGG16SegNetBasic, self).__init__(inputs=input_layer, outputs=output, name="VGG16SegNetBasic")
 
-    def encoder(self):
-        vgg16 = VGG16(weights='imagenet', include_top=False)
+    def encoder(self, input, no_of_classes):
+        vgg16 = VGG16(weights='imagenet', classes=no_of_classes, include_top=False, input_tensor=input)
+        for layer in vgg16.layers:
+            layer.trainable = False
         return vgg16.layers[-1].output
    
-    def decoder(self, max1, max2, max3, max4, max5):
-        up_sample_1 = UpSampling2D(size=(2, 2))(pool_5)
+    def decoder(self, input, kernel):
+        up_sample_1 = UpSampling2D(size=(2, 2))(input)
         conv_6 = self.convolution_block(up_sample_1, 512, kernel)
         conv_6 = self.convolution_block(conv_6, 512, kernel)
         conv_6 = self.convolution_block(conv_6, 512, kernel)

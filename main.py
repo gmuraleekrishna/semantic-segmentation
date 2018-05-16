@@ -1,7 +1,7 @@
 # Importing the Keras libraries and packages
 from keras.models import Sequential
 from keras import losses, optimizers
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop, Adamax
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from keras import utils
@@ -29,8 +29,8 @@ config.gpu_options.allow_growth = True  # dynamically grow the memory used on th
 sess = tf.Session(config=config)
 K.tensorflow_backend.set_session(sess)
 
-img_w = 480
-img_h = 352
+img_w = 224
+img_h = 224
 n_classes = 12
 n_train = 399
 n_val = 46
@@ -40,10 +40,11 @@ TRAIN_MASK_DIR = 'kitti/train/labels/'
 
 VAL_IMAGE_DIR = 'kitti/test/images/'
 VAL_MASK_DIR = 'kitti/test/labels/'
-BATCH_SIZE = 2
+BATCH_SIZE = 8
 
-model = SegNet(no_of_classes=n_classes, height=img_h, width=img_w)
-optimizer = Adam(lr=0.01)
+model = VGG16SegNetBasic(no_of_classes=n_classes, height=img_h, width=img_w)
+model.load_weights('weights.h5')
+optimizer = RMSprop(lr=0.001)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 utils.print_summary(model)
 print('Model size: ' + str(get_model_memory_usage(BATCH_SIZE, model)) + ' GB')
@@ -66,5 +67,5 @@ model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_o
 
 train_generator = zip(image_generator, mask_generator)
 print("Training")
-model.fit(images, labels, batch_size=BATCH_SIZE, epochs=20, verbose=1, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
+model.fit(images, labels, shuffle=True, batch_size=BATCH_SIZE, epochs=200, verbose=1, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
 model.save('fcn.h5')
