@@ -15,33 +15,25 @@ def load_train_data():
 def load_test_data():
     imgs_test = np.load('test_imgs.npy')
     imgs_id = np.load('test_maks.npy')
-    return imgs_test, imgs_id
+    return imgs_test, imgskitti__id
 
 
-def preprocess(imgs, img_h, img_w):
-    imgs_p = np.ndarray((imgs.shape[0], img_h, img_w), dtype=np.uint8)
-    for i in range(imgs.shape[0]):
-        imgs_p[i] = transform.resize(imgs[i], (img_h, img_w), preserve_range=True)
+# kitti_palette = {
+#     (128, 128, 128): 1,
+#     (128, 0, 0): 2,
+#     (128, 64, 128): 3,
+#     (0, 0, 192): 4,
+#     (64, 64, 128): 5,
+#     (128, 128, 0): 6,
+#     (192, 192, 128): 7,
+#     (64, 0, 128): 8,
+#     (192, 128, 128): 9,
+#     (64, 64, 0): 10,
+#     (0, 128, 192): 11,
+#     (0, 0, 0): 0,
+# }
 
-    imgs_p = imgs_p[..., np.newaxis]
-    return imgs_p
-
-palette = {
-    (128, 128, 128): 1,
-    (128, 0, 0): 2,
-    (128, 64, 128): 3,
-    (0, 0, 192): 4,
-    (64, 64, 128): 5,
-    (128, 128, 0): 6,
-    (192, 192, 128): 7,
-    (64, 0, 128): 8,
-    (192, 128, 128): 9,
-    (64, 64, 0): 10,
-    (0, 128, 192): 11,
-    (0, 0, 0): 0,
-}
-
-inverse_palette = {
+kitti_palette = {
     0: (0, 0, 0),
     1: (128, 128, 128),
     2: (128, 0, 0),
@@ -70,30 +62,49 @@ classes = {
     'cyclist': 11
 }
 
+rwth_kitti_palette = {
+    0: (0, 0, 0),
+    1: (255, 153,  0),
+    2: (0, 255, 0),
+    3: (255, 0,  0),
+    4: (255, 0, 255),
+    5: (153, 153, 153),
+    6: (0, 255, 255),
+    7: (255, 0, 153),
+    8: (0, 0, 255),
+    9: (153, 0, 255),
+    10: (0, 153, 255),
+    11: (255, 255, 153)
+}
 
-def convert_to_labels(masks, load_from_file=False):
+
+def convert_to_labels(masks, load_from_file=False, data_set='kitti'):
     labels = np.zeros((masks.shape[0], masks.shape[1], masks.shape[2], 12), dtype=np.uint8)
 
     if(load_from_file and os.path.exists('labels.npy')):
         labels = np.load('labels.npy')
     else:
+        if(data_set == 'kitti'):
+            selected_palette = kitti_palette
+        elif(data_set == 'rwth_kitti'):
+            selected_palette = rwth_kitti_palette
         count = 0
         for image in masks:
             percentage = int(100*count/masks.shape[0])
             s = str(percentage) + '%'  
             print('{0}\r'.format(s), end='') 
-            background = np.all(image == np.array(inverse_palette[0]).reshape(1, 1, 3), axis=2)
-            sky = np.all(image == np.array(inverse_palette[1]).reshape(1, 1, 3), axis=2)
-            building = np.all(image == np.array(inverse_palette[2]).reshape(1, 1, 3), axis=2)
-            road = np.all(image == np.array(inverse_palette[3]).reshape(1, 1, 3), axis=2)
-            sidewalk = np.all(image == np.array(inverse_palette[4]).reshape(1, 1, 3), axis=2)
-            fence = np.all(image == np.array(inverse_palette[5]).reshape(1, 1, 3), axis=2)
-            vegetation = np.all(image == np.array(inverse_palette[6]).reshape(1, 1, 3), axis=2)
-            pole = np.all(image == np.array(inverse_palette[7]).reshape(1, 1, 3), axis=2)
-            car = np.all(image == np.array(inverse_palette[8]).reshape(1, 1, 3), axis=2)
-            sign = np.all(image == np.array(inverse_palette[9]).reshape(1, 1, 3), axis=2)
-            pedestrian = np.all(image == np.array(inverse_palette[10]).reshape(1, 1, 3), axis=2)
-            cyclist = np.all(image == np.array(inverse_palette[11]).reshape(1, 1, 3), axis=2)
+            background = np.all(image == np.array(selected_palette[0]).reshape(1, 1, 3), axis=2)
+            sky = np.all(image == np.array(selected_palette[1]).reshape(1, 1, 3), axis=2)
+            building = np.all(image == np.array(selected_palette[2]).reshape(1, 1, 3), axis=2)
+            road = np.all(image == np.array(selected_palette[3]).reshape(1, 1, 3), axis=2)
+            sidewalk = np.all(image == np.array(selected_palette[4]).reshape(1, 1, 3), axis=2)
+            fence = np.all(image == np.array(selected_palette[5]).reshape(1, 1, 3), axis=2)
+            vegetation = np.all(image == np.array(selected_palette[6]).reshape(1, 1, 3), axis=2)
+            pole = np.all(image == np.array(selected_palette[7]).reshape(1, 1, 3), axis=2)
+            car = np.all(image == np.array(selected_palette[8]).reshape(1, 1, 3), axis=2)
+            sign = np.all(image == np.array(selected_palette[9]).reshape(1, 1, 3), axis=2)
+            pedestrian = np.all(image == np.array(selected_palette[10]).reshape(1, 1, 3), axis=2)
+            cyclist = np.all(image == np.array(selected_palette[11]).reshape(1, 1, 3), axis=2)
             categorical_labels = np.dstack([background, sky, building, road, sidewalk, fence, vegetation, pole, car, sign, pedestrian, cyclist])
             labels[count] = categorical_labels.astype(np.float32)
             count += 1
@@ -106,7 +117,7 @@ def get_images_and_masks(image_folder, mask_folder, height, width, load_from_fil
         images = np.load('images.npy')
         masks = np.load('masks.npy')
     else:
-        image_file_names = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f)) and f.endswith(".png")]
+        image_file_names = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f)) and f.endswith('.png')]
         number_of_images = len(image_file_names)
         images = np.zeros((number_of_images, height, width, 3))
         masks = np.zeros((number_of_images, height, width, 3))
