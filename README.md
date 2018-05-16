@@ -23,7 +23,7 @@ Use KITTI semantic segmentation dataset and create following folder structure
     $ tensorboard --logdir=graph/
     
 ## Background
-This semantic segmentation neural network architecure follows an Encoder-Decoder pattern. Here the image in convolved and maxpooled in the encoder and transpose-convolved and upsampled in the decoder network. Utlising the transfer learning [2] technique, the encoder network was replaced with pre trained VGG16 CNN to reduce training time and improve the accuracy. By doing this the CNN was small and simple enough to be trained using a GeForce 940M.
+This semantic segmentation neural network architecure follows an Encoder-Decoder pattern. Here the image in convolved and maxpooled in the encoder and transpose-convolved and upsampled in the decoder network. Encoder network is used for image recognition and decoder for image segmentation. Utilising the transfer learning [2] technique, the encoder network was replaced with pre trained VGG16 [3] CNN to reduce training time and improve the accuracy. This made the CNN smaller and simpler enough to be trained using a GeForce 940M.
 
 Training ran for 200 epocs with 8 images per batch. 
     
@@ -32,3 +32,5 @@ Training ran for 200 epocs with 8 images per batch.
  [1]   V. Badrinarayanan, A. Kendall, and R. Cipolla, "SegNet: A Deep Convolutional Encoder-Decoder Architecture for Image    Segmentation",  *arXiv:1511.005eprint61*, 2015.
  
  [2]  A. Karpathy, "CS231n Convolutional Neural Networks for Visual Recognition", Available: http://cs231n.github.io/transfer-learning/
+ 
+ [3] K. Simonyan & A. Zisserman, "Very Deep Convolutional Networks for Large-Scale Image Recognition", *ICLR 2015*, https://arxiv.org/pdf/1409.1556.pdf
