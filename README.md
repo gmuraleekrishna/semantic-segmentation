@@ -22,6 +22,6 @@ Use KITTI semantic segmentation dataset and create following folder structure
     $ python main.py
     $ tensorboard --logdir=graph/
     
-References:
+## References:
 
  [1]   V. Badrinarayanan, A. Kendall, and R. Cipolla, "SegNet: A Deep Convolutional Encoder-Decoder Architecture for Image Segmentation",  *arXiv:1511.005eprint61*, 2015
