@@ -1,5 +1,9 @@
-# Segmentation
-A project to semantically segment images with SegNet https://arxiv.org/pdf/1511.00561.pdf
+# Semantic Segmentation
+A project to semantically segment images with SegNet-like architecture
+
+The reference paper can be found at https://arxiv.org/pdf/1511.00561.pdf
+
+SegNet-like because the Maxpooling indices are not shared to decoder.
 
 Use KITTI semantic segmentation dataset and create following folder structure
 
