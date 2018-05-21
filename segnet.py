@@ -1,5 +1,5 @@
 from keras.models import Model
-from keras.layers import Conv2D,  BatchNormalization, Activation, Input, Reshape, UpSampling2D, MaxPooling2D, concatenate
+from keras.layers import Conv2D,  BatchNormalization, Activation, Input, Reshape, UpSampling2D, MaxPooling2D, concatenate, Permute
 
 
 class SegNet(Model):
@@ -12,7 +12,6 @@ class SegNet(Model):
         output = Conv2D(no_of_classes, (1, 1), padding="valid")(output)
         output = BatchNormalization()(output)
         output = Activation('softmax')(output)
-        self.layers.append([input_layer, output])
         super(SegNet, self).__init__(inputs=input_layer, outputs=output, name="SegNet")
 
     def convolution_block(self, input, filter, kernel):

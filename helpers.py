@@ -84,29 +84,29 @@ def convert_to_labels(masks, load_from_file=False, data_set='kitti'):
     if(load_from_file and os.path.exists('labels.npy')):
         labels = np.load('labels.npy')
     else:
-        if(data_set == 'kitti'):
+        if(data_set == "kitti"):
             selected_palette = kitti_palette
-        elif(data_set == 'rwth_kitti'):
+        elif(data_set == "rwth"):
             selected_palette = rwth_kitti_palette
         count = 0
         for image in masks:
             percentage = int(100*count/masks.shape[0])
             s = str(percentage) + '%'  
             print('{0}\r'.format(s), end='') 
-            background = np.all(image == np.array(selected_palette[0]).reshape(1, 1, 3), axis=2)
-            sky = np.all(image == np.array(selected_palette[1]).reshape(1, 1, 3), axis=2)
-            building = np.all(image == np.array(selected_palette[2]).reshape(1, 1, 3), axis=2)
-            road = np.all(image == np.array(selected_palette[3]).reshape(1, 1, 3), axis=2)
-            sidewalk = np.all(image == np.array(selected_palette[4]).reshape(1, 1, 3), axis=2)
-            fence = np.all(image == np.array(selected_palette[5]).reshape(1, 1, 3), axis=2)
-            vegetation = np.all(image == np.array(selected_palette[6]).reshape(1, 1, 3), axis=2)
-            pole = np.all(image == np.array(selected_palette[7]).reshape(1, 1, 3), axis=2)
-            car = np.all(image == np.array(selected_palette[8]).reshape(1, 1, 3), axis=2)
-            sign = np.all(image == np.array(selected_palette[9]).reshape(1, 1, 3), axis=2)
-            pedestrian = np.all(image == np.array(selected_palette[10]).reshape(1, 1, 3), axis=2)
-            cyclist = np.all(image == np.array(selected_palette[11]).reshape(1, 1, 3), axis=2)
+            background = np.all(image == np.array(selected_palette[0]).reshape(1, 1, 3), axis=2).astype('uint8')
+            sky = np.all(image == np.array(selected_palette[1]).reshape(1, 1, 3), axis=2).astype('uint8')
+            building = np.all(image == np.array(selected_palette[2]).reshape(1, 1, 3), axis=2).astype('uint8')
+            road = np.all(image == np.array(selected_palette[3]).reshape(1, 1, 3), axis=2).astype('uint8')
+            sidewalk = np.all(image == np.array(selected_palette[4]).reshape(1, 1, 3), axis=2).astype('uint8')
+            fence = np.all(image == np.array(selected_palette[5]).reshape(1, 1, 3), axis=2).astype('uint8')
+            vegetation = np.all(image == np.array(selected_palette[6]).reshape(1, 1, 3), axis=2).astype('uint8')
+            pole = np.all(image == np.array(selected_palette[7]).reshape(1, 1, 3), axis=2).astype('uint8')
+            car = np.all(image == np.array(selected_palette[8]).reshape(1, 1, 3), axis=2).astype('uint8')
+            sign = np.all(image == np.array(selected_palette[9]).reshape(1, 1, 3), axis=2).astype('uint8')
+            pedestrian = np.all(image == np.array(selected_palette[10]).reshape(1, 1, 3), axis=2).astype('uint8')
+            cyclist = np.all(image == np.array(selected_palette[11]).reshape(1, 1, 3), axis=2).astype('uint8')
             categorical_labels = np.dstack([background, sky, building, road, sidewalk, fence, vegetation, pole, car, sign, pedestrian, cyclist])
-            labels[count] = categorical_labels.astype(np.float32)
+            labels[count] = categorical_labels.astype(np.uint8)
             count += 1
         np.save('labels.npy', labels)
     return labels
@@ -117,7 +117,7 @@ def get_images_and_masks(image_folder, mask_folder, height, width, load_from_fil
         images = np.load('images.npy')
         masks = np.load('masks.npy')
     else:
-        image_file_names = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f)) and f.endswith('.png')]
+        image_file_names = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f)) and f.endswith(".png")]
         number_of_images = len(image_file_names)
         images = np.zeros((number_of_images, height, width, 3))
         masks = np.zeros((number_of_images, height, width, 3))
@@ -158,3 +158,17 @@ def get_model_memory_usage(batch_size, model):
     total_memory = 4.0*batch_size*(shapes_mem_count + trainable_count + non_trainable_count)
     gbytes = np.round(total_memory / (1024.0 ** 3), 3)
     return gbytes
+
+def normalized(rgb):
+    #return rgb/255.0
+    norm=np.zeros((rgb.shape[0], rgb.shape[1], 3),np.float32)
+
+    b=rgb[:,:,0]
+    g=rgb[:,:,1]
+    r=rgb[:,:,2]
+
+    norm[:,:,0]=cv2.equalizeHist(b)
+    norm[:,:,1]=cv2.equalizeHist(g)
+    norm[:,:,2]=cv2.equalizeHist(r)
+
+    return norm

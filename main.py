@@ -43,7 +43,6 @@ VAL_MASK_DIR = 'kitti/test/labels/'
 BATCH_SIZE = 8
 
 model = VGG16SegNetBasic(no_of_classes=n_classes, height=img_h, width=img_w)
-model.load_weights('weights.h5')
 optimizer = RMSprop(lr=0.001)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 utils.print_summary(model)
@@ -54,7 +53,7 @@ print("Generating dataset")
 images, masks = get_images_and_masks(TRAIN_IMAGE_DIR, TRAIN_MASK_DIR, img_h, img_w, load_from_file=True)
 print("Images imported")
 print("Creating labels")
-labels = convert_to_labels(masks, load_from_file=True)
+labels = convert_to_labels(masks, load_from_file=False, data_set='kitti')
 print("Labels created")
 image_datagen = ImageDataGenerator()
 mask_datagen = ImageDataGenerator()
@@ -67,5 +66,5 @@ model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_o
 
 train_generator = zip(image_generator, mask_generator)
 print("Training")
-model.fit(images, labels, shuffle=True, batch_size=BATCH_SIZE, epochs=200, verbose=1, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
+model.fit(images, labels, shuffle=True, epochs=200, verbose=1, validation_split=0.2, callbacks=[model_checkpoint, tensor_board_callback])
 model.save('fcn.h5')
